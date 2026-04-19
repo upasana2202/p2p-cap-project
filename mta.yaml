@@ -1,0 +1,60 @@
+_schema-version: "3.1"
+ID: p2p-cap-project
+description: SAP BTP CAP – Procure-to-Pay (P2P) for ABC Manufacturing Pvt. Ltd.
+version: 1.0.0
+
+modules:
+
+  # ─── CAP Backend Service ──────────────────────────────────────────────────
+  - name: p2p-cap-project-srv
+    type: nodejs
+    path: gen/srv
+    parameters:
+      buildpack: nodejs_buildpack
+      memory: 256M
+      disk-quota: 512M
+    build-parameters:
+      builder: npm
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
+    requires:
+      - name: p2p-hana-db
+      - name: p2p-auth
+
+  # ─── HANA DB Deployer ────────────────────────────────────────────────────
+  - name: p2p-cap-project-db-deployer
+    type: hdb
+    path: gen/db
+    parameters:
+      buildpack: nodejs_buildpack
+    requires:
+      - name: p2p-hana-db
+
+  # ─── Fiori App (SAPUI5) ──────────────────────────────────────────────────
+  - name: p2p-cap-project-app
+    type: html5
+    path: app
+    build-parameters:
+      builder: custom
+      commands:
+        - npm run build
+      supported-platforms: []
+
+resources:
+
+  # ─── SAP HANA Cloud ──────────────────────────────────────────────────────
+  - name: p2p-hana-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+
+  # ─── XSUAA (Authentication) ──────────────────────────────────────────────
+  - name: p2p-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json

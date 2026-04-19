@@ -1,0 +1,33 @@
+{
+  "xsappname": "p2p-cap-project",
+  "tenant-mode": "dedicated",
+  "description": "SAP BTP Security – P2P CAP Application",
+  "scopes": [
+    { "name": "$XSAPPNAME.Viewer",  "description": "View P2P data" },
+    { "name": "$XSAPPNAME.Manager", "description": "Create and approve PRs, POs, GRs, Invoices" }
+  ],
+  "role-templates": [
+    {
+      "name": "P2PViewer",
+      "description": "View all P2P documents",
+      "scope-references": ["$XSAPPNAME.Viewer"]
+    },
+    {
+      "name": "P2PManager",
+      "description": "Full access to all P2P operations",
+      "scope-references": ["$XSAPPNAME.Viewer", "$XSAPPNAME.Manager"]
+    }
+  ],
+  "role-collections": [
+    {
+      "name": "P2P Viewer",
+      "description": "Read-only access to P2P",
+      "role-template-references": ["$XSAPPNAME.P2PViewer"]
+    },
+    {
+      "name": "P2P Manager",
+      "description": "Full P2P process management",
+      "role-template-references": ["$XSAPPNAME.P2PManager"]
+    }
+  ]
+}
